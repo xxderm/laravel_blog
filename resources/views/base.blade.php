@@ -40,7 +40,7 @@
                 <a href="/profile">Аккаунт</a>
                 @if (Auth::check()) 
                     <a href="/profile/logout">Выход</a>                 
-                @endunless
+                @endif
             </div>
             <div class="content_body" align="center">
                 @yield('content')

@@ -8,25 +8,29 @@
       <div class="col col-lg-9 col-xl-7">
         <div class="card">
           <div class="p-4 text-black" style="background-color: #f8f9fa;">
-            <h5>UserEmail@gmail.com</h5>
+            <h5>{{ $user->email; }}</h5>
             <div class="d-flex justify-content-center text-center py-1">
               <div>
-                <p class="mb-1 h5">253</p>
-                <p class="small text-muted mb-0">Posts</p>
+                <p class="mb-1 h5">{{
+                    $user->Publications->count();
+                  }}</p>
+                <p class="small text-muted mb-0">Публикации</p>
               </div>
             </div>
           </div>
           <div class="card-body p-4 text-black">
             <div class="mb-5">
-              <p class="lead fw-normal mb-1">About</p>
+              <p class="lead fw-normal mb-1">Аккаунт</p>
               <div class="p-4" style="background-color: #f8f9fa;">
-                <p class="font-italic mb-1">Web Developer</p>
-                <p class="font-italic mb-1">Lives in New York</p>
-                <p class="font-italic mb-0">Photographer</p>
+                <p class="mb-1">{{ $user->email }}</p>
+                <a href="" class="mb-1">Сменить пароль</a>
+                @if(!$user->hasVerifiedEmail())
+                  <a href="">Подтвердите почту</a>
+                @endif
               </div>
             </div>
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <p class="lead fw-normal mb-0">Recent posts</p>
+              <p class="lead fw-normal mb-0">Предыдущие публикации</p>
             </div>
             <div class="row g-2">
               <div class="col mb-2">
