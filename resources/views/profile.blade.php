@@ -25,7 +25,12 @@
                 <p class="mb-1">{{ $user->email }}</p>
                 <a href="" class="mb-1">Сменить пароль</a>
                 @if(!$user->hasVerifiedEmail())
-                  <a href="">Подтвердите почту</a>
+                  <a href="/profile/verify">Подтвердите почту</a>
+                @endif
+                @if (Session::has('message'))
+                    <div class="alert alert-success">
+                      {{ Session::get('message') }}
+                    </div>
                 @endif
               </div>
             </div>

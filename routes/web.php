@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoginController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,3 +30,14 @@ Route::middleware('guest')->namespace('\App\Http\Controllers')->group(function()
 
 Route::get('/profile', [ProfileController::class, 'Show'])->middleware('auth')->name('/profile');
 Route::get('/profile/logout', [LoginController::class, 'LogOut'])->middleware('auth')->name('/profile/logout');
+
+Route::get('/profile/verify', function(Request $req) {
+    Auth::user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Verification link sent!');
+})->middleware('auth')->name('/profile/verify');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+ 
+    return redirect('/profile');
+})->middleware(['auth', 'signed'])->name('verification.verify');
