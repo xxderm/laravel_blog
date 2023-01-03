@@ -1,11 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,3 +45,38 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
  
     return redirect('/profile');
 })->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::get('/password-change', function (Request $request) {
+    $credentials = ['email' => Auth::user()->email];
+    $status = Password::sendResetLink($credentials);
+ 
+    return $status === Password::RESET_LINK_SENT
+                ? back()->with(['message' => __($status)])
+                : back()->withErrors(['email' => __($status)]);
+})->middleware('auth')->name('password.email');
+
+Route::get('/reset-password/{token}', function ($token) {
+    return view('reset_pass', ['token' => $token, 'user' => Auth::user()]);
+})->middleware('auth')->name('password.reset');
+
+Route::post('/change', function (Request $request) {
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+    
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->forceFill([
+                'password' => Hash::make($password)
+            ])->setRememberToken(Str::random(60));
+ 
+            $user->save();
+ 
+            event(new PasswordReset($user));
+        }
+    );
+    return redirect()->route('/profile')->with('message', __($status));
+})->middleware('auth')->name('password.update');

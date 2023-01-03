@@ -23,10 +23,13 @@
               <p class="lead fw-normal mb-1">Аккаунт</p>
               <div class="p-4" style="background-color: #f8f9fa;">
                 <p class="mb-1">{{ $user->email }}</p>
-                <a href="" class="mb-1">Сменить пароль</a>
                 @if(!$user->hasVerifiedEmail())
                   <a href="/profile/verify">Подтвердите почту</a>
+                @else 
+                  <p class="mb-1">Почта подтверждена!</p>
                 @endif
+                <p class="mb-1">На сайте с {{ $user->created_at }}</p>
+                <a href="/password-change" class="mb-1">Сменить пароль</a>
                 @if (Session::has('message'))
                     <div class="alert alert-success">
                       {{ Session::get('message') }}
