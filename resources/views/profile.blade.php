@@ -37,29 +37,30 @@
                 @endif
               </div>
             </div>
+            <a href="">Новая публикация</a>
+
+            <hr/>
+
             <div class="d-flex justify-content-between align-items-center mb-4">
               <p class="lead fw-normal mb-0">Предыдущие публикации</p>
             </div>
+
+            @foreach ($user->Publications as $publication)
+            <hr/>
             <div class="row g-2">
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(112).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col mb-2">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(107).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
+              <div style="margin:5px;" class="col mb-2 border-left border-primary">
+                  <a href=""><h3 align="left">{{ $publication->title }}</h3></a>
+                  <p align="left">{{ $publication->desc }}</p>  
+                  <p align="left">{{ $publication->content }}</p>
+              </div>     
+            </div>  
+            <div align="left">
+              <a href="">перейти</a>     
+              <a href="">редактировать</a>     
+              <a href="">удалить</a>    
             </div>
-            <div class="row g-2">
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(108).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-              <div class="col">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(114).webp"
-                  alt="image 1" class="w-100 rounded-3">
-              </div>
-            </div>
+            @endforeach
+
           </div>
         </div>
       </div>
