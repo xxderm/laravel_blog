@@ -12,6 +12,7 @@ use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Gate;
 
 /*
 |--------------------------------------------------------------------------
@@ -121,5 +122,10 @@ Route::post('/profile/new-post', function (Request $req) {
 })->middleware('auth')->name('profile.new-post');
 
 Route::get('/profile/delete-post/{id}', function ($id) {
+    $post = Post::find($id);
+    if (Gate::allows('update-post', $post)) {
+        Post::destroy($id);
+        return back()->with('message', 'Публикация удалена!');
+    }
     return back();
 })->middleware('auth')->name('profile.delete-post');
