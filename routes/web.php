@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Models\User;
@@ -36,116 +37,37 @@ Route::middleware('guest')->namespace('\App\Http\Controllers')->group(function()
 });
 
 Route::get('/profile', [ProfileController::class, 'Show'])->middleware('auth')->name('/profile');
+
 Route::get('/profile/logout', [LoginController::class, 'LogOut'])->middleware('auth')->name('/profile/logout');
 
-Route::get('/profile/verify', function(Request $req) {
-    Auth::user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Verification link sent!');
-})->middleware('auth')->name('/profile/verify');
+Route::get('/profile/verify', [ProfileController::class, 'SendVerifyNotify'])->middleware('auth')->name('/profile/verify');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
- 
-    return redirect('/profile');
-})->middleware(['auth', 'signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [ProfileController::class, 'Verify'])->middleware(['auth', 'signed'])->name('verification.verify');
 
-Route::get('/password-change', function (Request $request) {
-    $credentials = ['email' => Auth::user()->email];
-    $status = Password::sendResetLink($credentials);
- 
-    return $status === Password::RESET_LINK_SENT
-                ? back()->with(['message' => __($status)])
-                : back()->withErrors(['email' => __($status)]);
-})->middleware('auth')->name('password.email');
+Route::get('/password-change', [ProfileController::class, 'PasswordSendReset'])->middleware('auth')->name('password.email');
 
 Route::get('/reset-password/{token}', function ($token) {
     return view('reset_pass', ['token' => $token, 'user' => Auth::user()]);
 })->middleware('auth')->name('password.reset');
 
-Route::post('/change', function (Request $request) {
-    $request->validate([
-        'token' => 'required',
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-    
-    $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function ($user, $password) {
-            $user->forceFill([
-                'password' => Hash::make($password)
-            ])->setRememberToken(Str::random(60));
- 
-            $user->save();
- 
-            event(new PasswordReset($user));
-        }
-    );
-    return redirect()->route('/profile')->with('message', __($status));
-})->middleware('auth')->name('password.update');
+Route::post('/change', [ProfileController::class, 'PasswordUpdate'])->middleware('auth')->name('password.update');
 
 Route::get('/view-post/{id}', function ($id) {
     return view('view_post', ['post' => Post::find($id)]);
 })->middleware('auth')->name('view-post');
 
-Route::post('/view-post/push-comment/{id}', function (Request $req, $id) {
-    $content = $req->input('content');
-    Comment::create([
-        'user_id' => Auth::user()->id,
-        'post_id' => $id,
-        'content' => $content,
-        'votes' => '0'
-    ]);
-    return back();
-})->middleware('auth')->name('view-post.push-comment');
+Route::post('/view-post/push-comment/{id}', [PostController::class, 'PushComment'])->middleware('auth')->name('view-post.push-comment');
 
-Route::get('/view-post/like-comment/{id}', function ($commentId) {
-    $comment = Comment::find($commentId);
-    ++$comment->votes;
-    $comment->save();
-    return back();
-})->middleware('auth')->name('view-post.like-comment');
+Route::get('/view-post/like-comment/{id}', [PostController::class, 'LikeComment'])->middleware('auth')->name('view-post.like-comment');
 
 Route::get('/profile/new-post', function () {
     return view('new_post', ['user' => Auth::user()]);
 })->middleware('auth')->name('profile.new-post');
 
-Route::post('/profile/new-post', function (Request $req) {
-    $post = Post::create([
-        'user_id' => Auth::user()->id,
-        'title' => $req->input('title'),
-        'desc' => $req->input('desc'),
-        'content' => $req->input('content'),
-        'votes' => '0'
-    ]);
-    return redirect()->route('/profile')->with('message', 'Опубликовано!');
-})->middleware('auth')->name('profile.new-post');
+Route::post('/profile/new-post', [PostController::class, 'AddPost'])->middleware('auth')->name('profile.new-post');
 
-Route::get('/profile/delete-post/{id}', function ($id) {
-    $post = Post::find($id);
-    if (Gate::allows('update-post', $post)) {
-        Post::destroy($id);
-        return back()->with('message', 'Публикация удалена!');
-    }
-    return back();
-})->middleware('auth')->name('profile.delete-post');
+Route::get('/profile/delete-post/{id}', [PostController::class, 'DeletePost'])->middleware('auth')->name('profile.delete-post');
 
-Route::get('/profile/edit-post/{id}', function ($postId) {
-    $post = Post::find($postId);
-    if (Gate::allows('update-post', $post)) {
-        return view('edit_post', ['post' => $post, 'user' => Auth::user()]);
-    }
-    return back();
-})->middleware('auth')->name('profile.edit-post');
+Route::get('/profile/edit-post/{id}', [PostController::class, 'EditViewPost'])->middleware('auth')->name('profile.edit-post');
 
-Route::post('/profile/edit-post/{id}', function ($postId, Request $req) {
-    $post = Post::find($postId);
-    if (Gate::allows('update-post', $post)) {
-        $post->title = $req->input('title');
-        $post->desc = $req->input('desc');
-        $post->content = $req->input('content');
-        $post->save();
-        return redirect()->route('/profile')->with('message', 'Публикация обновлена!!');
-    }
-    return back();
-})->middleware('auth')->name('profile.edit-post');
+Route::post('/profile/edit-post/{id}', [PostController::class, 'UpdatePost'])->middleware('auth')->name('profile.edit-post');
