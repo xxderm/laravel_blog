@@ -46,19 +46,19 @@
             </div>
 
             @foreach ($user->Publications as $publication)
-            <hr/>
-            <div class="row g-2">
-              <div style="margin:5px;" class="col mb-2 border-left border-primary">
-                  <a href="{{ route('view-post', ['id' => $publication->id]) }}"><h3 align="left">{{ $publication->title }}</h3></a>
-                  <p align="left">{{ $publication->desc }}</p>  
-                  <p align="left">{{ $publication->content }}</p>
-              </div>     
-            </div>  
-            <div align="left">
-              <a href="{{ route('view-post', ['id' => $publication->id]) }}">перейти</a>     
-              <a href="">редактировать</a>     
-              <a href="{{ route('profile.delete-post', $publication->id) }}">удалить</a>    
-            </div>
+              <hr/>
+              <div class="row g-2">
+                <div style="margin:5px;" class="col mb-2 border-left border-primary">
+                    <a href="{{ route('view-post', ['id' => $publication->id]) }}"><h3 align="left">{{ $publication->title }}</h3></a>
+                    <p align="left">{{ $publication->desc }}</p>  
+                    <p align="left">{{ $publication->content }}</p>
+                </div>     
+              </div>  
+              <div align="left">
+                <a href="{{ route('view-post', ['id' => $publication->id]) }}">перейти</a>     
+                <a href="{{ route('profile.edit-post', $publication->id) }}">редактировать</a>     
+                <a href="{{ route('profile.delete-post', $publication->id) }}">удалить</a>    
+              </div>
             @endforeach
 
           </div>

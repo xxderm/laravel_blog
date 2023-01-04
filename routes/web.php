@@ -129,3 +129,23 @@ Route::get('/profile/delete-post/{id}', function ($id) {
     }
     return back();
 })->middleware('auth')->name('profile.delete-post');
+
+Route::get('/profile/edit-post/{id}', function ($postId) {
+    $post = Post::find($postId);
+    if (Gate::allows('update-post', $post)) {
+        return view('edit_post', ['post' => $post, 'user' => Auth::user()]);
+    }
+    return back();
+})->middleware('auth')->name('profile.edit-post');
+
+Route::post('/profile/edit-post/{id}', function ($postId, Request $req) {
+    $post = Post::find($postId);
+    if (Gate::allows('update-post', $post)) {
+        $post->title = $req->input('title');
+        $post->desc = $req->input('desc');
+        $post->content = $req->input('content');
+        $post->save();
+        return redirect()->route('/profile')->with('message', 'Публикация обновлена!!');
+    }
+    return back();
+})->middleware('auth')->name('profile.edit-post');
