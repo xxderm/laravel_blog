@@ -9,6 +9,6 @@ class HomeController extends Controller
 {   
     public function Show()
     {
-        return view('home', ['posts' => Post::all()]);    
+        return view('home', ['posts' => Post::paginate(2)]);    
     }
 }
