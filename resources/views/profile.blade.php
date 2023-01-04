@@ -57,7 +57,7 @@
             <div align="left">
               <a href="{{ route('view-post', ['id' => $publication->id]) }}">перейти</a>     
               <a href="">редактировать</a>     
-              <a href="">удалить</a>    
+              <a href="{{ route('profile.delete-post', $publication->id) }}">удалить</a>    
             </div>
             @endforeach
 

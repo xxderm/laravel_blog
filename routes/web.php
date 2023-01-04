@@ -119,3 +119,7 @@ Route::post('/profile/new-post', function (Request $req) {
     ]);
     return redirect()->route('/profile')->with('message', 'Опубликовано!');
 })->middleware('auth')->name('profile.new-post');
+
+Route::get('/profile/delete-post/{id}', function ($id) {
+    return back();
+})->middleware('auth')->name('profile.delete-post');
