@@ -8,7 +8,7 @@
         <hr/>
         <div class="row g-2">
             <div style="margin:5px;" class="col mb-2 border-left border-primary">
-                <a href=""><h3 align="left">{{ $publication->title }}</h3></a>
+                <a href="{{ route('view-post', ['id' => $publication->id]) }}"><h3 align="left">{{ $publication->title }}</h3></a>
                 <p align="left">{{ $publication->desc }}</p>  
                 <p align="left">{{ $publication->content }}</p>
             </div>     

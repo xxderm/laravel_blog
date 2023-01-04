@@ -7,6 +7,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Models\User;
+use App\Models\Post;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
@@ -80,3 +82,33 @@ Route::post('/change', function (Request $request) {
     );
     return redirect()->route('/profile')->with('message', __($status));
 })->middleware('auth')->name('password.update');
+
+Route::get('/view-post/{id}', function ($id) {
+    return view('view_post', ['post' => Post::find($id)]);
+})->middleware('auth')->name('view-post');
+
+Route::post('/view-post/push-comment/{id}', function (Request $req, $id) {
+    $content = $req->input('content');
+    Comment::create([
+        'user_id' => Auth::user()->id,
+        'post_id' => $id,
+        'content' => $content,
+        'votes' => '0'
+    ]);
+    return back();
+})->middleware('auth')->name('view-post.push-comment');
+
+Route::get('/profile/new-post', function () {
+    return view('new_post', ['user' => Auth::user()]);
+})->middleware('auth')->name('profile.new-post');
+
+Route::post('/profile/new-post', function (Request $req) {
+    $post = Post::create([
+        'user_id' => Auth::user()->id,
+        'title' => $req->input('title'),
+        'desc' => $req->input('desc'),
+        'content' => $req->input('content'),
+        'votes' => '0'
+    ]);
+    return redirect()->route('/profile')->with('message', 'Опубликовано!');
+})->middleware('auth')->name('profile.new-post');
