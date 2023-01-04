@@ -98,6 +98,13 @@ Route::post('/view-post/push-comment/{id}', function (Request $req, $id) {
     return back();
 })->middleware('auth')->name('view-post.push-comment');
 
+Route::get('/view-post/like-comment/{id}', function ($commentId) {
+    $comment = Comment::find($commentId);
+    ++$comment->votes;
+    $comment->save();
+    return back();
+})->middleware('auth')->name('view-post.like-comment');
+
 Route::get('/profile/new-post', function () {
     return view('new_post', ['user' => Auth::user()]);
 })->middleware('auth')->name('profile.new-post');

@@ -9,7 +9,8 @@
             <p align="left" >{{ $post->desc }}</p>
             <p align="left" >{{ $post->content }}</p>
             <p align="left" >Издатель: {{ $post->Publisher->email }}</p>
-            <p align="left" >Дата: {{ $post->created_at }}</p>
+            <p align="left" >Дата публикации: {{ $post->created_at }}</p>
+            <p align="left" >Дата обновления: {{ $post->updated_at }}</p>
         </div>
     </div>
 </section>
@@ -37,8 +38,12 @@
                         {{ $comment->content }}
                         </p>
                 </div>
+                
             </div>
-
+            <div align="left" style="padding-bottom:10px;">
+                <p >понравилось: {{ $comment->votes }}</p>
+                <a class="btn btn-primary" href="{{ route('view-post.like-comment', $comment->id) }}" role="button">Нравится</a>
+            </div>
             <hr class="my-0" />
             @endforeach
 
